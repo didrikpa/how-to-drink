@@ -207,45 +207,82 @@ export function PlayerApp() {
         <div className="challenge-screen">
           <h2>{state.currentChallenge.title}</h2>
 
-          {isTargeted && (
+          {/* Pop Quiz - target player answers */}
+          {isTargeted && state.currentChallenge.classType === 'pop-quiz' && state.currentChallenge.options && (
+            <div className="quiz-section">
+              <p className="quiz-question">{state.currentChallenge.description}</p>
+              <div className="answer-options">
+                {state.currentChallenge.options.map((option) => (
+                  <button
+                    key={option}
+                    onClick={() => answer(state.currentChallenge!.id, option)}
+                    className="answer-btn"
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Physical Ed / Drama - target player sees their challenge */}
+          {isTargeted && (state.currentChallenge.classType === 'physical-education' || state.currentChallenge.classType === 'drama-class') && (
+            <div className="you-are-up">
+              <h3>YOU ARE UP!</h3>
+              <p>{state.currentChallenge.description}</p>
+              <p className="wait-msg">Others will vote if you pass...</p>
+            </div>
+          )}
+
+          {/* Detention / Recess - target sees the challenge */}
+          {isTargeted && (state.currentChallenge.classType === 'detention' || state.currentChallenge.classType === 'recess') && (
             <div className="you-are-up">
               <h3>YOU ARE UP!</h3>
               <p>{state.currentChallenge.description}</p>
             </div>
           )}
 
-          {canVote && state.currentChallenge.options && (
-            <div className="vote-options">
-              {state.currentChallenge.options.map((option) => (
-                <button
-                  key={option}
-                  onClick={() => vote(state.currentChallenge!.id, option)}
-                  className="vote-btn"
-                >
-                  {option}
-                </button>
-              ))}
+          {/* Social Studies - everyone votes for a player */}
+          {canVote && state.currentChallenge.classType === 'social-studies' && state.currentChallenge.options && (
+            <div className="vote-section">
+              <p className="vote-prompt">{state.currentChallenge.description}</p>
+              <div className="vote-options">
+                {state.currentChallenge.options.map((option) => (
+                  <button
+                    key={option}
+                    onClick={() => vote(state.currentChallenge!.id, option)}
+                    className="vote-btn"
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
-          {canVote && !state.currentChallenge.options && (
+          {/* Physical Ed / Drama - voters see pass/fail */}
+          {canVote && (state.currentChallenge.classType === 'physical-education' || state.currentChallenge.classType === 'drama-class') && (
             <div className="pass-fail-vote">
+              <p>{state.currentChallenge.description}</p>
               <p>Did they pass?</p>
-              <button
-                onClick={() => passFail(state.currentChallenge!.id, true)}
-                className="pass-btn"
-              >
-                PASS
-              </button>
-              <button
-                onClick={() => passFail(state.currentChallenge!.id, false)}
-                className="fail-btn"
-              >
-                FAIL
-              </button>
+              <div className="pass-fail-buttons">
+                <button
+                  onClick={() => passFail(state.currentChallenge!.id, true)}
+                  className="pass-btn"
+                >
+                  PASS
+                </button>
+                <button
+                  onClick={() => passFail(state.currentChallenge!.id, false)}
+                  className="fail-btn"
+                >
+                  FAIL
+                </button>
+              </div>
             </div>
           )}
 
+          {/* Not involved - watch the screen */}
           {!isTargeted && !canVote && (
             <p>Watch the main screen</p>
           )}

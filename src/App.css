@@ -548,24 +548,58 @@ input:focus {
   font-size: 0.6rem;
 }
 
+.quiz-section,
+.vote-section {
+  padding: 20px;
+  border: 4px solid var(--accent-purple);
+  background: var(--bg-medium);
+}
+
+.quiz-question,
+.vote-prompt {
+  font-size: 0.6rem;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.answer-options,
 .vote-options {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-top: 20px;
 }
 
+.answer-btn,
 .vote-btn {
   width: 100%;
 }
 
+.answer-btn {
+  background: var(--accent-purple);
+  border-color: var(--accent-purple);
+}
+
+.wait-msg {
+  font-size: 0.5rem;
+  color: var(--text-dim);
+  margin-top: 15px;
+}
+
 .pass-fail-vote {
-  margin-top: 20px;
+  padding: 20px;
+  border: 4px solid var(--accent-orange);
+  background: var(--bg-medium);
 }
 
 .pass-fail-vote p {
   font-size: 0.6rem;
   margin-bottom: 15px;
+}
+
+.pass-fail-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
 }
 
 .pass-btn,
