@@ -4,12 +4,11 @@ import type {
   Player,
   GameState,
   GameSettings,
-  Challenge,
   ChallengeResult,
   ClientMessage,
   ServerMessage,
-  DEFAULT_SETTINGS,
 } from '../types/game';
+import { generateChallenge } from '../game/challenges/index';
 
 interface ClientConnection {
   ws: WebSocket;
@@ -286,39 +285,29 @@ export class GameServer {
   }
 
   private triggerChallenge(): void {
-    // TODO: Implement actual challenge selection
-    const challenge = this.generateRandomChallenge();
+    const enabledClasses = this.state.settings.enabledClasses;
+    const classType = enabledClasses[Math.floor(Math.random() * enabledClasses.length)];
+    const connectedPlayers = this.state.players.filter((p) => p.connected);
+
+    if (connectedPlayers.length === 0) {
+      this.startCountdown();
+      return;
+    }
+
+    const challenge = generateChallenge(classType, connectedPlayers, this.state.players);
     this.state.phase = 'challenge';
     this.state.currentChallenge = challenge;
+
+    console.log(`[GameServer] Challenge: ${challenge.title}`);
 
     this.broadcastState();
     this.broadcast({ type: 'challenge-start', challenge });
 
-    // For now, auto-complete after 10 seconds
-    // TODO: Implement proper challenge completion logic
+    // Auto-complete challenge after time limit
+    const timeLimit = (challenge.timeLimit || 15) * 1000;
     setTimeout(() => {
       this.completeChallenge();
-    }, 10000);
-  }
-
-  private generateRandomChallenge(): Challenge {
-    const enabledClasses = this.state.settings.enabledClasses;
-    const classType = enabledClasses[Math.floor(Math.random() * enabledClasses.length)];
-    const connectedPlayers = this.state.players.filter((p) => p.connected);
-    const targetPlayer = connectedPlayers[Math.floor(Math.random() * connectedPlayers.length)];
-
-    // Placeholder challenge
-    return {
-      id: this.generateId(),
-      classType,
-      title: `${classType.replace('-', ' ').toUpperCase()}`,
-      description: `Challenge for ${targetPlayer?.name || 'someone'}`,
-      targetPlayerIds: targetPlayer ? [targetPlayer.id] : [],
-      votingPlayerIds: connectedPlayers
-        .filter((p) => p.id !== targetPlayer?.id)
-        .map((p) => p.id),
-      timeLimit: 10,
-    };
+    }, timeLimit);
   }
 
   private completeChallenge(): void {
