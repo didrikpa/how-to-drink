@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type {
   GameState,
-  Player,
   ClientMessage,
   ServerMessage,
   GameSettings,
@@ -32,29 +31,47 @@ export function useGameSocket({ isHost }: UseGameSocketOptions): UseGameSocketRe
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isHostRef = useRef(isHost);
+  const mountedRef = useRef(true);
 
-  useEffect(() => {
+  isHostRef.current = isHost;
+
+  const connect = useCallback(() => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      return;
+    }
+
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
     wsRef.current = ws;
 
     ws.onopen = () => {
+      if (!mountedRef.current) return;
       setConnected(true);
       setError(null);
-      if (isHost) {
-        send({ type: 'host-connect' });
+      if (isHostRef.current) {
+        ws.send(JSON.stringify({ type: 'host-connect' }));
       }
     };
 
     ws.onclose = () => {
+      if (!mountedRef.current) return;
       setConnected(false);
+      // Reconnect after a delay
+      reconnectTimeoutRef.current = setTimeout(() => {
+        if (mountedRef.current) {
+          connect();
+        }
+      }, 1000);
     };
 
     ws.onerror = () => {
-      setError('Connection error');
+      // Error will trigger onclose, so reconnect happens there
     };
 
     ws.onmessage = (event) => {
+      if (!mountedRef.current) return;
       try {
         const message: ServerMessage = JSON.parse(event.data);
         handleMessage(message);
@@ -62,11 +79,7 @@ export function useGameSocket({ isHost }: UseGameSocketOptions): UseGameSocketRe
         console.error('Failed to parse message:', err);
       }
     };
-
-    return () => {
-      ws.close();
-    };
-  }, [isHost]);
+  }, []);
 
   const handleMessage = (message: ServerMessage) => {
     switch (message.type) {
@@ -121,6 +134,22 @@ export function useGameSocket({ isHost }: UseGameSocketOptions): UseGameSocketRe
         break;
     }
   };
+
+  useEffect(() => {
+    mountedRef.current = true;
+    connect();
+
+    return () => {
+      mountedRef.current = false;
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+    };
+  }, [connect]);
 
   const send = useCallback((message: ClientMessage) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
