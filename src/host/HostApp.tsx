@@ -3,9 +3,10 @@ import { useGameSocket } from '../hooks/useGameSocket';
 import { QRCodeSVG } from 'qrcode.react';
 
 export function HostApp() {
-  const { connected, state, startGame, kickPlayer, endGame } = useGameSocket({
+  const { connected, state, startGame, kickPlayer, endGame, updateSettings } = useGameSocket({
     isHost: true,
   });
+  const [showSettings, setShowSettings] = useState(false);
 
   const playerUrl =
     typeof window !== 'undefined'
@@ -70,6 +71,43 @@ export function HostApp() {
               ))}
             </div>
           </div>
+
+          <button
+            className="settings-toggle"
+            onClick={() => setShowSettings(!showSettings)}
+          >
+            {showSettings ? 'HIDE SETTINGS' : 'SETTINGS'}
+          </button>
+
+          {showSettings && (
+            <div className="settings-panel">
+              <h3>TIMER SETTINGS</h3>
+              <div className="setting-row">
+                <label>Min seconds:</label>
+                <input
+                  type="number"
+                  value={state.settings.minTimerSeconds}
+                  min={5}
+                  max={300}
+                  onChange={(e) =>
+                    updateSettings({ minTimerSeconds: parseInt(e.target.value) || 30 })
+                  }
+                />
+              </div>
+              <div className="setting-row">
+                <label>Max seconds:</label>
+                <input
+                  type="number"
+                  value={state.settings.maxTimerSeconds}
+                  min={5}
+                  max={300}
+                  onChange={(e) =>
+                    updateSettings({ maxTimerSeconds: parseInt(e.target.value) || 90 })
+                  }
+                />
+              </div>
+            </div>
+          )}
 
           {connectedPlayers.length >= 2 && (
             <button className="start-btn" onClick={startGame}>
