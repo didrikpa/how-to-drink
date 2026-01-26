@@ -435,6 +435,21 @@ input:focus {
   width: 100%;
 }
 
+.camera-error {
+  font-size: 0.4rem;
+  color: var(--accent-red);
+  text-align: center;
+  margin: 10px 0;
+}
+
+.file-btn {
+  width: 100%;
+  margin-top: 10px;
+  font-size: 0.5rem;
+  background: var(--accent-purple);
+  border-color: var(--accent-purple);
+}
+
 .camera-view {
   display: flex;
   flex-direction: column;
