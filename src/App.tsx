@@ -2,6 +2,8 @@ import { HostApp } from './host/HostApp';
 import { PlayerApp } from './player/PlayerApp';
 import { ContractsHostApp } from './host/ContractsHostApp';
 import { ContractsPlayerApp } from './player/ContractsPlayerApp';
+import { ManualApp } from './host/ManualApp';
+import { ShotBoxApp } from './host/ShotBoxApp';
 import './App.css';
 
 function App() {
@@ -18,6 +20,12 @@ function App() {
   // Host routes
   if (path === '/contracts') {
     return <ContractsHostApp />;
+  }
+  if (path === '/manual') {
+    return <ManualApp />;
+  }
+  if (path === '/shotbox') {
+    return <ShotBoxApp />;
   }
 
   // Default: mode selector for host
@@ -54,6 +62,22 @@ function ModePicker() {
             Use strategy tokens, build the Tab, and settle your debts.
           </p>
           <span className="ct-mode-tag">NEW</span>
+        </a>
+
+        <a href="/manual" className="ct-mode-card ct-mode-manual">
+          <h2>DRINKING MANUAL</h2>
+          <p className="ct-mode-desc">
+            Shot Box style. One rule per turn. No arguing.
+          </p>
+          <span className="ct-mode-tag">NEW</span>
+        </a>
+
+        <a href="/shotbox" className="ct-mode-card ct-mode-shotbox">
+          <h2>SHOT BOX</h2>
+          <p className="ct-mode-desc">
+            Random timer. Random victim. Take a shot.
+          </p>
+          <span className="ct-mode-tag">CLASSIC</span>
         </a>
       </div>
     </div>
