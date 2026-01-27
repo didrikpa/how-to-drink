@@ -29,31 +29,49 @@ export function PlayerApp() {
     }
   }, []);
 
-  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
+    try {
+      // Decode at reduced resolution to avoid memory issues on phones
+      const bitmap = await createImageBitmap(file, {
+        resizeWidth: 400,
+        resizeHeight: 400,
+        resizeQuality: 'medium',
+      });
+      const canvas = document.createElement('canvas');
+      canvas.width = 200;
+      canvas.height = 200;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) { bitmap.close(); return; }
+
+      const size = Math.min(bitmap.width, bitmap.height);
+      const x = (bitmap.width - size) / 2;
+      const y = (bitmap.height - size) / 2;
+      ctx.drawImage(bitmap, x, y, size, size, 0, 0, 200, 200);
+      bitmap.close();
+
+      setPhoto(canvas.toDataURL('image/jpeg', 0.5));
+    } catch {
+      // Fallback for browsers without createImageBitmap resize support
+      const url = URL.createObjectURL(file);
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
         canvas.width = 200;
         canvas.height = 200;
         const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-
-        // Crop to square from center
+        if (!ctx) { URL.revokeObjectURL(url); return; }
         const size = Math.min(img.width, img.height);
         const x = (img.width - size) / 2;
         const y = (img.height - size) / 2;
         ctx.drawImage(img, x, y, size, size, 0, 0, 200, 200);
-
-        setPhoto(canvas.toDataURL('image/jpeg', 0.7));
+        setPhoto(canvas.toDataURL('image/jpeg', 0.5));
+        URL.revokeObjectURL(url);
       };
-      img.src = event.target?.result as string;
-    };
-    reader.readAsDataURL(file);
+      img.src = url;
+    }
   }, []);
 
   const takePhoto = useCallback(() => {
@@ -125,7 +143,6 @@ export function PlayerApp() {
                   ref={fileInputRef}
                   type="file"
                   accept="image/*"
-                  capture="user"
                   onChange={handleFileSelect}
                   style={{ display: 'none' }}
                 />
