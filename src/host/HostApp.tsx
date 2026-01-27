@@ -7,11 +7,21 @@ export function HostApp() {
     isHost: true,
   });
   const [showSettings, setShowSettings] = useState(false);
+  const [showRules, setShowRules] = useState(false);
+  const [playerUrl, setPlayerUrl] = useState('');
 
-  const playerUrl =
-    typeof window !== 'undefined'
-      ? `${window.location.protocol}//${window.location.host}/play`
-      : '';
+  useEffect(() => {
+    fetch('/api/lan-ip')
+      .then(r => r.json())
+      .then(({ ip }) => {
+        const port = window.location.port;
+        const proto = window.location.protocol;
+        setPlayerUrl(`${proto}//${ip}${port ? ':' + port : ''}/play`);
+      })
+      .catch(() => {
+        setPlayerUrl(`${window.location.protocol}//${window.location.host}/play`);
+      });
+  }, []);
 
   if (!connected) {
     return (
@@ -42,6 +52,9 @@ export function HostApp() {
 
       {state.phase === 'lobby' && (
         <div className="lobby">
+          <button className="back-btn" onClick={() => { window.location.href = '/'; }}>
+            BACK TO MENU
+          </button>
           <div className="join-section">
             <h2>JOIN THE CLASS</h2>
             <div className="qr-container">
@@ -72,12 +85,56 @@ export function HostApp() {
             </div>
           </div>
 
-          <button
-            className="settings-toggle"
-            onClick={() => setShowSettings(!showSettings)}
-          >
-            {showSettings ? 'HIDE SETTINGS' : 'SETTINGS'}
-          </button>
+          <div className="lobby-toggles">
+            <button
+              className="settings-toggle"
+              onClick={() => { setShowRules(!showRules); setShowSettings(false); }}
+            >
+              {showRules ? 'HIDE RULES' : 'HOW TO PLAY'}
+            </button>
+            <button
+              className="settings-toggle"
+              onClick={() => { setShowSettings(!showSettings); setShowRules(false); }}
+            >
+              {showSettings ? 'HIDE SETTINGS' : 'SETTINGS'}
+            </button>
+          </div>
+
+          {showRules && (
+            <div className="rules-panel">
+              <h3>HOW TO PLAY</h3>
+              <p className="rules-intro">
+                A random timer counts down, then the screen picks a class
+                and targets random players. Survive the lesson or drink!
+              </p>
+              <div className="rules-classes">
+                <div className="rules-class">
+                  <span className="rules-class-name">POP QUIZ</span>
+                  <span className="rules-class-desc">Trivia question - wrong answer = 3 sips</span>
+                </div>
+                <div className="rules-class">
+                  <span className="rules-class-name">SOCIAL STUDIES</span>
+                  <span className="rules-class-desc">Vote "who is most likely to..." - most voted drinks 2 sips</span>
+                </div>
+                <div className="rules-class">
+                  <span className="rules-class-name">PHYSICAL ED</span>
+                  <span className="rules-class-desc">Do a physical challenge - others vote pass/fail. Fail = 3 sips</span>
+                </div>
+                <div className="rules-class">
+                  <span className="rules-class-name">DRAMA CLASS</span>
+                  <span className="rules-class-desc">Act out a prompt - others vote pass/fail. Fail = 3 sips</span>
+                </div>
+                <div className="rules-class">
+                  <span className="rules-class-name">DETENTION</span>
+                  <span className="rules-class-desc">Punishment rounds - waterfall, everyone drinks, or target someone</span>
+                </div>
+                <div className="rules-class">
+                  <span className="rules-class-name">RECESS</span>
+                  <span className="rules-class-desc">Mini-games: RPS, categories, word games. Loser drinks 2 sips</span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {showSettings && (
             <div className="settings-panel">
