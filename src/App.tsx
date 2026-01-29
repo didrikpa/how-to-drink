@@ -4,6 +4,8 @@ import { ContractsHostApp } from './host/ContractsHostApp';
 import { ContractsPlayerApp } from './player/ContractsPlayerApp';
 import { ManualApp } from './host/ManualApp';
 import { ShotBoxApp } from './host/ShotBoxApp';
+import { GhostHostApp } from './host/GhostHostApp';
+import { GhostHostPlayerApp } from './player/GhostHostPlayerApp';
 import './App.css';
 
 function App() {
@@ -16,6 +18,9 @@ function App() {
   if (path === '/play-contracts') {
     return <ContractsPlayerApp />;
   }
+  if (path === '/play-ghosthost') {
+    return <GhostHostPlayerApp />;
+  }
 
   // Host routes
   if (path === '/contracts') {
@@ -26,6 +31,9 @@ function App() {
   }
   if (path === '/shotbox') {
     return <ShotBoxApp />;
+  }
+  if (path === '/ghosthost') {
+    return <GhostHostApp />;
   }
 
   // Default: mode selector for host
@@ -78,6 +86,15 @@ function ModePicker() {
             Random timer. Random victim. Take a shot.
           </p>
           <span className="ct-mode-tag">CLASSIC</span>
+        </a>
+
+        <a href="/ghosthost" className="ct-mode-card ct-mode-ghosthost">
+          <h2>GHOST HOST</h2>
+          <p className="ct-mode-desc">
+            One player is secretly the Ghost with missions.
+            Mortals must identify them before time runs out.
+          </p>
+          <span className="ct-mode-tag">NEW</span>
         </a>
       </div>
     </div>

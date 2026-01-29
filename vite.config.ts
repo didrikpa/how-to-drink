@@ -4,6 +4,7 @@ import { WebSocketServer } from 'ws'
 import { networkInterfaces } from 'os'
 import { GameServer } from './src/server/GameServer'
 import { ContractsGameServer } from './src/server/ContractsGameServer'
+import { GhostHostServer } from './src/server/GhostHostServer'
 
 function getLanIp(): string {
   const nets = networkInterfaces()
@@ -20,6 +21,7 @@ function getLanIp(): string {
 function gameServerPlugin(): Plugin {
   let gameServer: GameServer | null = null
   let contractsServer: ContractsGameServer | null = null
+  let ghostHostServer: GhostHostServer | null = null
 
   return {
     name: 'game-server',
@@ -32,6 +34,7 @@ function gameServerPlugin(): Plugin {
 
       const wss = new WebSocketServer({ noServer: true })
       const wssContracts = new WebSocketServer({ noServer: true })
+      const wssGhostHost = new WebSocketServer({ noServer: true })
 
       gameServer = new GameServer()
       gameServer.attach(wss)
@@ -40,6 +43,12 @@ function gameServerPlugin(): Plugin {
 
       wssContracts.on('connection', (ws) => {
         contractsServer!.handleConnection(ws)
+      })
+
+      ghostHostServer = new GhostHostServer()
+
+      wssGhostHost.on('connection', (ws) => {
+        ghostHostServer!.handleConnection(ws)
       })
 
       server.httpServer?.on('upgrade', (request, socket, head) => {
@@ -51,10 +60,14 @@ function gameServerPlugin(): Plugin {
           wssContracts.handleUpgrade(request, socket, head, (ws) => {
             wssContracts.emit('connection', ws, request)
           })
+        } else if (request.url === '/ws-ghosthost') {
+          wssGhostHost.handleUpgrade(request, socket, head, (ws) => {
+            wssGhostHost.emit('connection', ws, request)
+          })
         }
       })
 
-      console.log('[Vite] Game WebSocket servers ready at /ws and /ws-contracts')
+      console.log('[Vite] Game WebSocket servers ready at /ws, /ws-contracts, and /ws-ghosthost')
     },
   }
 }

@@ -1962,3 +1962,690 @@ input:focus {
   display: flex;
   gap: 10px;
 }
+
+/* ==========================================
+   GHOST HOST MODE
+   ========================================== */
+
+:root {
+  --gh-primary: #6b5b95;
+  --gh-accent: #88d8b0;
+  --gh-danger: #ff6f69;
+  --gh-dark: #1a1a2e;
+  --gh-glow: rgba(136, 216, 176, 0.4);
+}
+
+/* Mode picker card */
+.ct-mode-ghosthost {
+  border-color: var(--gh-primary);
+}
+
+.ct-mode-ghosthost .ct-mode-tag {
+  background: var(--gh-primary);
+  color: white;
+}
+
+.ct-mode-ghosthost:hover {
+  border-color: var(--gh-accent);
+}
+
+/* General ghost host app styles */
+.gh-app {
+  background: var(--gh-dark);
+}
+
+.gh-title {
+  color: var(--gh-accent);
+  text-shadow: 4px 4px 0 var(--gh-primary);
+}
+
+.gh-subtitle {
+  color: var(--gh-primary);
+}
+
+/* Lobby */
+.gh-lobby {
+  gap: 25px;
+}
+
+.gh-join-section {
+  border-color: var(--gh-primary);
+}
+
+.gh-player-card {
+  border-color: var(--gh-primary);
+}
+
+.gh-rules-panel {
+  border-color: var(--gh-accent);
+}
+
+.gh-rules-panel h3 {
+  color: var(--gh-accent);
+}
+
+.gh-settings-panel {
+  border-color: var(--gh-primary);
+}
+
+.gh-start-btn {
+  background: var(--gh-primary);
+  border-color: var(--gh-accent);
+  color: white;
+}
+
+.gh-start-btn:hover {
+  background: var(--gh-accent);
+  color: var(--gh-dark);
+}
+
+/* Playing phase */
+.gh-phase {
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.gh-playing {
+  position: relative;
+}
+
+/* Timer */
+.gh-timer {
+  text-align: center;
+  padding: 20px;
+}
+
+.gh-timer-value {
+  font-size: 4rem;
+  color: var(--gh-accent);
+  display: block;
+  text-shadow: 0 0 20px var(--gh-glow), 0 0 40px var(--gh-glow);
+}
+
+.gh-timer-label {
+  font-size: 0.5rem;
+  color: var(--text-dim);
+}
+
+/* Haunt counter */
+.gh-haunt-counter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px 30px;
+  border: 4px solid var(--gh-primary);
+  background: var(--bg-medium);
+}
+
+.gh-haunt-label {
+  font-size: 0.5rem;
+  color: var(--gh-primary);
+}
+
+.gh-haunt-value {
+  font-size: 2rem;
+  color: var(--gh-accent);
+  text-shadow: 0 0 10px var(--gh-glow);
+}
+
+/* Rules display */
+.gh-rules-display {
+  padding: 15px 25px;
+  border: 3px solid var(--gh-primary);
+  background: var(--bg-medium);
+  width: 100%;
+  max-width: 500px;
+}
+
+.gh-rules-display h3 {
+  color: var(--gh-accent);
+  font-size: 0.6rem;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.gh-rules-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.gh-rules-list li {
+  font-size: 0.5rem;
+  color: var(--text-dim);
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(107, 91, 149, 0.3);
+}
+
+.gh-rules-list li:last-child {
+  border-bottom: none;
+}
+
+/* Players grid */
+.gh-players-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  width: 100%;
+}
+
+.gh-player-card-large {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+  border: 3px solid var(--gh-primary);
+  background: var(--bg-medium);
+}
+
+.gh-player-photo-large {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border: 3px solid var(--gh-accent);
+}
+
+.gh-player-name-large {
+  font-size: 0.5rem;
+  margin-top: 10px;
+  color: var(--text-light);
+}
+
+/* Haunt overlay */
+.gh-haunt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(107, 91, 149, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: gh-shake 0.5s ease-in-out;
+}
+
+.gh-haunt-text {
+  font-size: 4rem;
+  color: var(--gh-accent);
+  text-shadow: 0 0 30px var(--gh-glow), 0 0 60px var(--gh-glow);
+  animation: gh-pulse-text 0.5s ease-in-out infinite;
+}
+
+@keyframes gh-shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+  20%, 40%, 60%, 80% { transform: translateX(10px); }
+}
+
+@keyframes gh-pulse-text {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+/* Controls */
+.gh-controls {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 10;
+}
+
+/* Voting phase */
+.gh-voting {
+  text-align: center;
+}
+
+.gh-voting-title {
+  font-size: 1.2rem;
+  color: var(--gh-accent);
+  text-shadow: 0 0 15px var(--gh-glow);
+}
+
+.gh-voting-subtitle {
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  margin-top: 10px;
+}
+
+.gh-voting-timer {
+  text-align: center;
+  padding: 15px;
+}
+
+.gh-voting-timer-value {
+  font-size: 3rem;
+  color: var(--gh-danger);
+  display: block;
+}
+
+.gh-voting-timer-label {
+  font-size: 0.4rem;
+  color: var(--text-dim);
+}
+
+.gh-vote-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+}
+
+.gh-vote-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+  border: 3px solid var(--gh-primary);
+  background: var(--bg-medium);
+  min-width: 120px;
+}
+
+.gh-vote-photo {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border: 2px solid var(--gh-accent);
+}
+
+.gh-vote-name {
+  font-size: 0.45rem;
+  margin-top: 8px;
+  color: var(--text-light);
+}
+
+.gh-vote-count {
+  font-size: 0.6rem;
+  color: var(--gh-accent);
+  margin-top: 5px;
+}
+
+/* Result phase */
+.gh-result {
+  text-align: center;
+}
+
+.gh-result-title {
+  font-size: 1.5rem;
+  color: var(--gh-accent);
+  text-shadow: 0 0 20px var(--gh-glow);
+}
+
+.gh-ghost-reveal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 25px;
+  border: 4px solid var(--gh-accent);
+  background: var(--bg-medium);
+  margin: 20px 0;
+}
+
+.gh-reveal-label {
+  font-size: 0.6rem;
+  color: var(--gh-primary);
+  margin-bottom: 15px;
+}
+
+.gh-reveal-photo {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border: 4px solid var(--gh-accent);
+  box-shadow: 0 0 30px var(--gh-glow);
+}
+
+.gh-reveal-name {
+  font-size: 1.2rem;
+  color: var(--gh-accent);
+  margin-top: 15px;
+}
+
+.gh-penalty {
+  padding: 15px 25px;
+  border: 3px solid var(--gh-danger);
+  background: var(--bg-medium);
+}
+
+.gh-penalty-text {
+  font-size: 0.6rem;
+  color: var(--gh-danger);
+  margin: 0;
+}
+
+/* ========== GHOST HOST PLAYER APP ========== */
+
+.gh-player-app {
+  background: var(--gh-dark);
+}
+
+.gh-player-header {
+  background: var(--bg-medium);
+  border-bottom-color: var(--gh-primary);
+}
+
+.gh-role-badge {
+  font-size: 0.4rem;
+  padding: 4px 8px;
+}
+
+.gh-role-ghost {
+  background: var(--gh-accent);
+  color: var(--gh-dark);
+}
+
+.gh-role-mortal {
+  background: var(--gh-primary);
+  color: white;
+}
+
+.gh-join-btn {
+  background: var(--gh-primary);
+  border-color: var(--gh-accent);
+  color: white;
+}
+
+.gh-waiting {
+  padding: 40px 20px;
+}
+
+.gh-waiting h2 {
+  color: var(--gh-accent);
+}
+
+/* Ghost view */
+.gh-ghost-view {
+  text-align: center;
+  padding: 20px;
+  width: 100%;
+}
+
+.gh-your-role {
+  font-size: 0.8rem;
+  color: var(--gh-accent);
+  margin-bottom: 20px;
+}
+
+.gh-mission-card {
+  padding: 20px;
+  border: 4px solid var(--gh-accent);
+  background: var(--bg-medium);
+  margin-bottom: 20px;
+}
+
+.gh-mission-label {
+  font-size: 0.4rem;
+  color: var(--gh-primary);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.gh-mission-category {
+  font-size: 0.35rem;
+  color: var(--gh-dark);
+  background: var(--gh-accent);
+  padding: 3px 8px;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.gh-mission-text {
+  font-size: 0.6rem;
+  color: var(--text-light);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.gh-haunt-btn {
+  font-size: 1rem;
+  padding: 20px 50px;
+  background: var(--gh-accent);
+  border: 4px solid var(--gh-primary);
+  color: var(--gh-dark);
+  box-shadow: 0 0 20px var(--gh-glow);
+  animation: gh-glow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes gh-glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px var(--gh-glow); }
+  50% { box-shadow: 0 0 40px var(--gh-glow), 0 0 60px var(--gh-glow); }
+}
+
+.gh-haunt-btn:hover {
+  background: white;
+  transform: scale(1.05);
+}
+
+.gh-haunt-hint {
+  font-size: 0.4rem;
+  color: var(--text-dim);
+  margin-top: 10px;
+}
+
+.gh-rules-reminder {
+  padding: 15px;
+  border: 2px solid var(--gh-primary);
+  background: var(--bg-medium);
+  margin-top: 20px;
+  width: 100%;
+  text-align: left;
+}
+
+.gh-rules-reminder h4 {
+  font-size: 0.4rem;
+  color: var(--gh-accent);
+  margin-bottom: 8px;
+}
+
+.gh-rules-reminder ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.gh-rules-reminder li {
+  font-size: 0.35rem;
+  color: var(--text-dim);
+  padding: 3px 0;
+}
+
+/* Mortal view */
+.gh-mortal-view {
+  text-align: center;
+  padding: 20px;
+  width: 100%;
+}
+
+.gh-mortal-hint {
+  font-size: 0.5rem;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+}
+
+.gh-haunt-counter-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px 25px;
+  border: 3px solid var(--gh-primary);
+  background: var(--bg-medium);
+  margin-bottom: 20px;
+}
+
+/* Player haunt overlay */
+.gh-haunt-overlay-player {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(107, 91, 149, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: gh-shake 0.5s ease-in-out;
+}
+
+.gh-haunt-text-player {
+  font-size: 3rem;
+  color: var(--gh-accent);
+  text-shadow: 0 0 30px var(--gh-glow), 0 0 60px var(--gh-glow);
+  animation: gh-pulse-text 0.5s ease-in-out infinite;
+}
+
+.gh-haunt-dismiss {
+  font-size: 0.4rem;
+  color: var(--text-dim);
+  margin-top: 30px;
+}
+
+/* Voting - player */
+.gh-voting-player {
+  text-align: center;
+  padding: 20px;
+  width: 100%;
+}
+
+.gh-voting-player h2 {
+  color: var(--gh-accent);
+  margin-bottom: 10px;
+}
+
+.gh-voting-hint {
+  font-size: 0.45rem;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+}
+
+.gh-vote-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.gh-vote-btn {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 15px;
+  border: 3px solid var(--gh-primary);
+  background: var(--bg-medium);
+  color: var(--text-light);
+  text-align: left;
+  width: 100%;
+}
+
+.gh-vote-btn.gh-voted {
+  border-color: var(--gh-accent);
+  background: rgba(136, 216, 176, 0.1);
+}
+
+.gh-vote-btn-photo {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border: 2px solid var(--gh-accent);
+}
+
+.gh-vote-btn-name {
+  flex: 1;
+  font-size: 0.5rem;
+}
+
+.gh-vote-check {
+  font-size: 0.4rem;
+  color: var(--gh-accent);
+}
+
+/* Voting - ghost waiting */
+.gh-voting-ghost {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.gh-voting-ghost h2 {
+  color: var(--gh-accent);
+}
+
+.gh-ghost-wait {
+  font-size: 0.5rem;
+  color: var(--text-dim);
+  margin: 20px 0;
+}
+
+.gh-ghost-suspense {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  border: 4px solid var(--gh-primary);
+  border-radius: 50%;
+  margin: 0 auto;
+  animation: gh-pulse-border 1.5s ease-in-out infinite;
+}
+
+.gh-suspense-icon {
+  font-size: 3rem;
+  color: var(--gh-accent);
+}
+
+@keyframes gh-pulse-border {
+  0%, 100% { border-color: var(--gh-primary); }
+  50% { border-color: var(--gh-accent); }
+}
+
+/* Result - player */
+.gh-result-player {
+  text-align: center;
+  padding: 30px 20px;
+}
+
+.gh-result-title-player {
+  font-size: 1rem;
+  color: var(--gh-accent);
+  margin-bottom: 20px;
+}
+
+.gh-result-reveal {
+  padding: 15px;
+  border: 3px solid var(--gh-primary);
+  background: var(--bg-medium);
+  margin-bottom: 20px;
+}
+
+.gh-result-reveal p {
+  font-size: 0.45rem;
+  color: var(--text-dim);
+  margin: 0 0 8px 0;
+}
+
+.gh-result-name {
+  font-size: 0.8rem;
+  color: var(--gh-accent);
+}
+
+.gh-result-penalty {
+  font-size: 0.5rem;
+  color: var(--gh-danger);
+  padding: 15px;
+  border: 2px solid var(--gh-danger);
+  background: rgba(255, 111, 105, 0.1);
+}
+
+.gh-result-win {
+  font-size: 0.5rem;
+  color: var(--gh-accent);
+  padding: 15px;
+  border: 2px solid var(--gh-accent);
+  background: rgba(136, 216, 176, 0.1);
+}
