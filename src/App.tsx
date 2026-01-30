@@ -6,6 +6,8 @@ import { ManualApp } from './host/ManualApp';
 import { ShotBoxApp } from './host/ShotBoxApp';
 import { GhostHostApp } from './host/GhostHostApp';
 import { GhostHostPlayerApp } from './player/GhostHostPlayerApp';
+import { BettingApp } from './host/BettingApp';
+import { BettingPlayerApp } from './player/BettingPlayerApp';
 import './App.css';
 
 function App() {
@@ -21,6 +23,9 @@ function App() {
   if (path === '/play-ghosthost') {
     return <GhostHostPlayerApp />;
   }
+  if (path === '/play-betting') {
+    return <BettingPlayerApp />;
+  }
 
   // Host routes
   if (path === '/contracts') {
@@ -34,6 +39,9 @@ function App() {
   }
   if (path === '/ghosthost') {
     return <GhostHostApp />;
+  }
+  if (path === '/betting') {
+    return <BettingApp />;
   }
 
   // Default: mode selector for host
@@ -93,6 +101,15 @@ function ModePicker() {
           <p className="ct-mode-desc">
             One player is secretly the Ghost with missions.
             Mortals must identify them before time runs out.
+          </p>
+          <span className="ct-mode-tag">NEW</span>
+        </a>
+
+        <a href="/betting" className="ct-mode-card ct-mode-betting">
+          <h2>RACE BETTING</h2>
+          <p className="ct-mode-desc">
+            Bet sips or shots on race cars.
+            Winners give drinks, losers drink their bets.
           </p>
           <span className="ct-mode-tag">NEW</span>
         </a>

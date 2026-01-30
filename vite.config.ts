@@ -5,6 +5,7 @@ import { networkInterfaces } from 'os'
 import { GameServer } from './src/server/GameServer'
 import { ContractsGameServer } from './src/server/ContractsGameServer'
 import { GhostHostServer } from './src/server/GhostHostServer'
+import { BettingServer } from './src/server/BettingServer'
 
 function getLanIp(): string {
   const nets = networkInterfaces()
@@ -22,6 +23,7 @@ function gameServerPlugin(): Plugin {
   let gameServer: GameServer | null = null
   let contractsServer: ContractsGameServer | null = null
   let ghostHostServer: GhostHostServer | null = null
+  let bettingServer: BettingServer | null = null
 
   return {
     name: 'game-server',
@@ -35,6 +37,7 @@ function gameServerPlugin(): Plugin {
       const wss = new WebSocketServer({ noServer: true })
       const wssContracts = new WebSocketServer({ noServer: true })
       const wssGhostHost = new WebSocketServer({ noServer: true })
+      const wssBetting = new WebSocketServer({ noServer: true })
 
       gameServer = new GameServer()
       gameServer.attach(wss)
@@ -51,6 +54,12 @@ function gameServerPlugin(): Plugin {
         ghostHostServer!.handleConnection(ws)
       })
 
+      bettingServer = new BettingServer()
+
+      wssBetting.on('connection', (ws) => {
+        bettingServer!.handleConnection(ws)
+      })
+
       server.httpServer?.on('upgrade', (request, socket, head) => {
         if (request.url === '/ws') {
           wss.handleUpgrade(request, socket, head, (ws) => {
@@ -64,10 +73,14 @@ function gameServerPlugin(): Plugin {
           wssGhostHost.handleUpgrade(request, socket, head, (ws) => {
             wssGhostHost.emit('connection', ws, request)
           })
+        } else if (request.url === '/ws-betting') {
+          wssBetting.handleUpgrade(request, socket, head, (ws) => {
+            wssBetting.emit('connection', ws, request)
+          })
         }
       })
 
-      console.log('[Vite] Game WebSocket servers ready at /ws, /ws-contracts, and /ws-ghosthost')
+      console.log('[Vite] Game WebSocket servers ready at /ws, /ws-contracts, /ws-ghosthost, and /ws-betting')
     },
   }
 }
