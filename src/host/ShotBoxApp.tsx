@@ -16,23 +16,56 @@ const STORAGE_KEY = 'mode.shotBox.v1';
 function playBuzzer() {
   try {
     const ctx = new AudioContext();
-    // Short aggressive buzzer
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = 'square';
-    osc.frequency.value = 220;
-    gain.gain.value = 0.4;
-    osc.start();
-    // Ramp frequency up for urgency
-    osc.frequency.setValueAtTime(220, ctx.currentTime);
-    osc.frequency.linearRampToValueAtTime(440, ctx.currentTime + 0.15);
-    osc.frequency.setValueAtTime(220, ctx.currentTime + 0.15);
-    osc.frequency.linearRampToValueAtTime(440, ctx.currentTime + 0.3);
-    gain.gain.setValueAtTime(0.4, ctx.currentTime + 0.3);
-    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.5);
-    osc.stop(ctx.currentTime + 0.5);
+    const now = ctx.currentTime;
+
+    // Deep bass hit
+    const bass = ctx.createOscillator();
+    const bassGain = ctx.createGain();
+    bass.connect(bassGain);
+    bassGain.connect(ctx.destination);
+    bass.type = 'sine';
+    bass.frequency.setValueAtTime(80, now);
+    bass.frequency.exponentialRampToValueAtTime(30, now + 0.4);
+    bassGain.gain.setValueAtTime(0.8, now);
+    bassGain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+    bass.start(now);
+    bass.stop(now + 0.5);
+
+    // Mid punch
+    const mid = ctx.createOscillator();
+    const midGain = ctx.createGain();
+    mid.connect(midGain);
+    midGain.connect(ctx.destination);
+    mid.type = 'sawtooth';
+    mid.frequency.setValueAtTime(120, now);
+    mid.frequency.exponentialRampToValueAtTime(40, now + 0.3);
+    midGain.gain.setValueAtTime(0.5, now);
+    midGain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+    mid.start(now);
+    mid.stop(now + 0.35);
+
+    // Noise burst for explosion texture
+    const bufferSize = ctx.sampleRate * 0.2;
+    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      output[i] = Math.random() * 2 - 1;
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = noiseBuffer;
+    const noiseGain = ctx.createGain();
+    const noiseFilter = ctx.createBiquadFilter();
+    noiseFilter.type = 'lowpass';
+    noiseFilter.frequency.setValueAtTime(1000, now);
+    noiseFilter.frequency.exponentialRampToValueAtTime(100, now + 0.15);
+    noise.connect(noiseFilter);
+    noiseFilter.connect(noiseGain);
+    noiseGain.connect(ctx.destination);
+    noiseGain.gain.setValueAtTime(0.6, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+    noise.start(now);
+    noise.stop(now + 0.2);
+
     setTimeout(() => ctx.close(), 600);
   } catch { /* audio not available */ }
 }
