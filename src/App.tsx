@@ -8,6 +8,7 @@ import { GhostHostApp } from './host/GhostHostApp';
 import { GhostHostPlayerApp } from './player/GhostHostPlayerApp';
 import { BettingApp } from './host/BettingApp';
 import { BettingPlayerApp } from './player/BettingPlayerApp';
+import { SpinWheelApp } from './host/SpinWheelApp';
 import './App.css';
 
 function App() {
@@ -42,6 +43,9 @@ function App() {
   }
   if (path === '/betting') {
     return <BettingApp />;
+  }
+  if (path === '/spinwheel') {
+    return <SpinWheelApp />;
   }
 
   // Default: mode selector for host
@@ -110,6 +114,15 @@ function ModePicker() {
           <p className="ct-mode-desc">
             Bet sips or shots on race cars.
             Winners give drinks, losers drink their bets.
+          </p>
+          <span className="ct-mode-tag">NEW</span>
+        </a>
+
+        <a href="/spinwheel" className="ct-mode-card ct-mode-spinwheel">
+          <h2>SPIN THE WHEEL</h2>
+          <p className="ct-mode-desc">
+            Take turns spinning the wheel of fate.
+            Land on it. Drink it. No escaping destiny.
           </p>
           <span className="ct-mode-tag">NEW</span>
         </a>
