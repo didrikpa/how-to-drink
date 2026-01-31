@@ -342,7 +342,7 @@ export function SpinWheelApp() {
                     textAnchor="middle"
                     dominantBaseline="middle"
                     fill="white"
-                    fontSize="14"
+                    fontSize="16"
                     fontFamily="'Press Start 2P', monospace"
                     style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}
                   >
