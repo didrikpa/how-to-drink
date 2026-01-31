@@ -304,37 +304,65 @@ export function SpinWheelApp() {
         {/* Wheel container */}
         <div className="sw-wheel-container">
           <div className="sw-pointer" />
-          <div
+          <svg
             className="sw-wheel"
+            viewBox="0 0 200 200"
             style={{
               transform: `rotate(${rotation}deg)`,
               transition: isSpinning ? 'transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)' : 'none',
             }}
           >
             {WHEEL_SEGMENTS.map((segment, i) => {
-              const angle = (360 / WHEEL_SEGMENTS.length) * i;
-              const skew = 90 - (360 / WHEEL_SEGMENTS.length);
+              const segmentAngle = 360 / WHEEL_SEGMENTS.length;
+              const startAngle = i * segmentAngle - 90; // -90 to start from top
+              const endAngle = startAngle + segmentAngle;
+              const startRad = (startAngle * Math.PI) / 180;
+              const endRad = (endAngle * Math.PI) / 180;
+              const x1 = 100 + 100 * Math.cos(startRad);
+              const y1 = 100 + 100 * Math.sin(startRad);
+              const x2 = 100 + 100 * Math.cos(endRad);
+              const y2 = 100 + 100 * Math.sin(endRad);
+              const largeArc = segmentAngle > 180 ? 1 : 0;
+              const midAngle = startAngle + segmentAngle / 2;
+              const midRad = (midAngle * Math.PI) / 180;
+              const textX = 100 + 65 * Math.cos(midRad);
+              const textY = 100 + 65 * Math.sin(midRad);
+
               return (
-                <div
-                  key={i}
-                  className="sw-segment"
-                  style={{
-                    backgroundColor: segment.color,
-                    transform: `rotate(${angle}deg) skewY(-${skew}deg)`,
-                  }}
-                >
-                  <span
-                    className="sw-segment-label"
-                    style={{
-                      transform: `skewY(${skew}deg) rotate(${360 / WHEEL_SEGMENTS.length / 2}deg)`,
-                    }}
+                <g key={i}>
+                  <path
+                    d={`M 100 100 L ${x1} ${y1} A 100 100 0 ${largeArc} 1 ${x2} ${y2} Z`}
+                    fill={segment.color}
+                    stroke="#1a1a2e"
+                    strokeWidth="1"
+                  />
+                  <text
+                    x={textX}
+                    y={textY}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fill="white"
+                    fontSize="12"
+                    fontFamily="'Press Start 2P', monospace"
+                    style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}
                   >
-                    {segment.label}
-                  </span>
-                </div>
+                    {i + 1}
+                  </text>
+                </g>
               );
             })}
-          </div>
+            <circle cx="100" cy="100" r="20" fill="#1a1a2e" stroke="#9b59b6" strokeWidth="3" />
+          </svg>
+        </div>
+
+        {/* Legend */}
+        <div className="sw-legend">
+          {WHEEL_SEGMENTS.map((segment, i) => (
+            <div key={i} className="sw-legend-item">
+              <span className="sw-legend-num" style={{ backgroundColor: segment.color }}>{i + 1}</span>
+              <span className="sw-legend-label">{segment.label}</span>
+            </div>
+          ))}
         </div>
 
         {/* Spin button or result */}
