@@ -17,35 +17,58 @@ function playBuzzer() {
   try {
     const ctx = new AudioContext();
     const now = ctx.currentTime;
+    const duration = 1.5;
 
-    // Deep bass hit
-    const bass = ctx.createOscillator();
-    const bassGain = ctx.createGain();
-    bass.connect(bassGain);
-    bassGain.connect(ctx.destination);
-    bass.type = 'sine';
-    bass.frequency.setValueAtTime(80, now);
-    bass.frequency.exponentialRampToValueAtTime(30, now + 0.4);
-    bassGain.gain.setValueAtTime(0.8, now);
-    bassGain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-    bass.start(now);
-    bass.stop(now + 0.5);
+    // Vuvuzela is a B-flat drone around 235 Hz with strong harmonics
+    const fundamentalFreq = 235;
 
-    // Mid punch
-    const mid = ctx.createOscillator();
-    const midGain = ctx.createGain();
-    mid.connect(midGain);
-    midGain.connect(ctx.destination);
-    mid.type = 'sawtooth';
-    mid.frequency.setValueAtTime(120, now);
-    mid.frequency.exponentialRampToValueAtTime(40, now + 0.3);
-    midGain.gain.setValueAtTime(0.5, now);
-    midGain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
-    mid.start(now);
-    mid.stop(now + 0.35);
+    // Create master gain for overall volume
+    const masterGain = ctx.createGain();
+    masterGain.connect(ctx.destination);
+    masterGain.gain.setValueAtTime(0.6, now);
+    masterGain.gain.exponentialRampToValueAtTime(0.7, now + 0.1);
+    masterGain.gain.setValueAtTime(0.7, now + duration - 0.2);
+    masterGain.gain.exponentialRampToValueAtTime(0.01, now + duration);
 
-    // Noise burst for explosion texture
-    const bufferSize = ctx.sampleRate * 0.2;
+    // Fundamental tone (strongest)
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.connect(gain1);
+    gain1.connect(masterGain);
+    osc1.type = 'sawtooth';
+    osc1.frequency.setValueAtTime(fundamentalFreq, now);
+    // Add slight pitch wobble for realism
+    osc1.frequency.setValueAtTime(fundamentalFreq + 2, now + 0.3);
+    osc1.frequency.setValueAtTime(fundamentalFreq - 1, now + 0.6);
+    osc1.frequency.setValueAtTime(fundamentalFreq + 1, now + 0.9);
+    gain1.gain.setValueAtTime(0.5, now);
+    osc1.start(now);
+    osc1.stop(now + duration);
+
+    // Second harmonic
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.connect(gain2);
+    gain2.connect(masterGain);
+    osc2.type = 'sawtooth';
+    osc2.frequency.setValueAtTime(fundamentalFreq * 2, now);
+    gain2.gain.setValueAtTime(0.3, now);
+    osc2.start(now);
+    osc2.stop(now + duration);
+
+    // Third harmonic
+    const osc3 = ctx.createOscillator();
+    const gain3 = ctx.createGain();
+    osc3.connect(gain3);
+    gain3.connect(masterGain);
+    osc3.type = 'triangle';
+    osc3.frequency.setValueAtTime(fundamentalFreq * 3, now);
+    gain3.gain.setValueAtTime(0.15, now);
+    osc3.start(now);
+    osc3.stop(now + duration);
+
+    // Add buzzy texture with noise
+    const bufferSize = ctx.sampleRate * duration;
     const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const output = noiseBuffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
@@ -53,21 +76,33 @@ function playBuzzer() {
     }
     const noise = ctx.createBufferSource();
     noise.buffer = noiseBuffer;
-    const noiseGain = ctx.createGain();
     const noiseFilter = ctx.createBiquadFilter();
-    noiseFilter.type = 'lowpass';
-    noiseFilter.frequency.setValueAtTime(1000, now);
-    noiseFilter.frequency.exponentialRampToValueAtTime(100, now + 0.15);
+    noiseFilter.type = 'bandpass';
+    noiseFilter.frequency.setValueAtTime(fundamentalFreq * 2, now);
+    noiseFilter.Q.setValueAtTime(5, now);
+    const noiseGain = ctx.createGain();
     noise.connect(noiseFilter);
     noiseFilter.connect(noiseGain);
-    noiseGain.connect(ctx.destination);
-    noiseGain.gain.setValueAtTime(0.6, now);
-    noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+    noiseGain.connect(masterGain);
+    noiseGain.gain.setValueAtTime(0.08, now);
     noise.start(now);
-    noise.stop(now + 0.2);
+    noise.stop(now + duration);
 
-    setTimeout(() => ctx.close(), 600);
+    setTimeout(() => ctx.close(), (duration + 0.2) * 1000);
   } catch { /* audio not available */ }
+}
+
+function loadSavedState(): ShotBoxState | null {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const data = JSON.parse(saved);
+      if (data.gameState) {
+        return data.gameState;
+      }
+    }
+  } catch { /* ignore */ }
+  return null;
 }
 
 export function ShotBoxApp() {
@@ -76,8 +111,8 @@ export function ShotBoxApp() {
   const [minSeconds, setMinSeconds] = useState(10);
   const [maxSeconds, setMaxSeconds] = useState(60);
 
-  // Game state
-  const [gameState, setGameState] = useState<ShotBoxState | null>(null);
+  // Game state - lazy init from localStorage
+  const [gameState, setGameState] = useState<ShotBoxState | null>(loadSavedState);
   const [phase, setPhase] = useState<'countdown' | 'reveal'>('countdown');
   const [timerEnd, setTimerEnd] = useState<number>(0);
   const [remaining, setRemaining] = useState<number>(0);
@@ -85,22 +120,25 @@ export function ShotBoxApp() {
   const [paused, setPaused] = useState(false);
   const pausedAtRef = useRef<number>(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const initTimerRef = useRef(false);
 
-  // Load saved state
+  function startTimer(min: number, max: number) {
+    const duration = (min + Math.random() * (max - min)) * 1000;
+    setTimerEnd(Date.now() + duration);
+    setRemaining(duration);
+    setPhase('countdown');
+    setSelectedPlayer(null);
+  }
+
+  // Start timer on mount if there's saved game state
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const data = JSON.parse(saved);
-        if (data.gameState) {
-          setGameState(data.gameState);
-          setPhase('countdown');
-          // Start a fresh timer on resume
-          startTimer(data.gameState.minSeconds, data.gameState.maxSeconds);
-        }
-      }
-    } catch { /* ignore */ }
-  }, []);
+    if (initTimerRef.current) return;
+    initTimerRef.current = true;
+    if (gameState) {
+      // Use setTimeout to avoid sync setState warning
+      setTimeout(() => startTimer(gameState.minSeconds, gameState.maxSeconds), 0);
+    }
+  }, [gameState]);
 
   // Save game state
   useEffect(() => {
@@ -155,14 +193,6 @@ export function ShotBoxApp() {
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, [phase, paused, timerEnd, gameState]);
-
-  function startTimer(min: number, max: number) {
-    const duration = (min + Math.random() * (max - min)) * 1000;
-    setTimerEnd(Date.now() + duration);
-    setRemaining(duration);
-    setPhase('countdown');
-    setSelectedPlayer(null);
-  }
 
   const startGame = useCallback(() => {
     const players = playerNames

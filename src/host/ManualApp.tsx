@@ -396,13 +396,21 @@ export function ManualApp() {
           </button>
         </div>
 
-        {/* History toggle */}
-        <button
-          className="dm-history-toggle"
-          onClick={() => setShowHistory(!showHistory)}
-        >
-          {showHistory ? 'HIDE HISTORY' : 'HISTORY'}
-        </button>
+        {/* Bottom controls */}
+        <div className="dm-bottom-controls">
+          <button
+            className="dm-history-toggle"
+            onClick={() => setShowHistory(!showHistory)}
+          >
+            {showHistory ? 'HIDE HISTORY' : 'HISTORY'}
+          </button>
+          <button
+            className="back-btn dm-menu-btn"
+            onClick={() => { window.location.href = '/'; }}
+          >
+            MENU
+          </button>
+        </div>
 
         {showHistory && recentHistory.length > 0 && (
           <div className="dm-history">

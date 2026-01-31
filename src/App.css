@@ -1695,8 +1695,21 @@ input:focus {
   max-width: 250px;
 }
 
+/* Bottom controls */
+.dm-bottom-controls {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  justify-content: center;
+}
+
 /* History */
 .dm-history-toggle {
+  font-size: 0.4rem;
+  padding: 8px 16px;
+}
+
+.dm-menu-btn {
   font-size: 0.4rem;
   padding: 8px 16px;
 }
@@ -3326,4 +3339,19 @@ input:focus {
   background: var(--bg-medium);
   font-size: 0.5rem;
   color: var(--text-dim);
+}
+
+/* Betting player back button */
+.bt-back-btn {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  text-decoration: none;
+}
+
+/* Betting gallery button - match camera button style */
+.bt-gallery-btn {
+  background: var(--bt-primary);
+  border-color: var(--bt-secondary);
+  margin-top: 10px;
 }

@@ -24,6 +24,17 @@ export function BettingPlayerApp() {
   const [selectedRacer, setSelectedRacer] = useState<number | null>(null);
   const [betAmount, setBetAmount] = useState(1);
   const [betType, setBetType] = useState<'sip' | 'shot'>('sip');
+  const [lastRoundNumber, setLastRoundNumber] = useState(0);
+
+  // Clear bets when a new round starts
+  useEffect(() => {
+    if (state && state.phase === 'betting' && state.roundNumber !== lastRoundNumber) {
+      setMyBets([]);
+      setSelectedRacer(null);
+      setBetAmount(1);
+      setLastRoundNumber(state.roundNumber);
+    }
+  }, [state, lastRoundNumber]);
 
   // Cleanup camera on unmount
   useEffect(() => {
@@ -142,6 +153,7 @@ export function BettingPlayerApp() {
   if (!playerId || !state) {
     return (
       <div className="player-app join-screen bt-player-app">
+        <a href="/" className="back-btn bt-back-btn">BACK TO MENU</a>
         <h1>RACE BETTING</h1>
         <form
           className="join-form"
@@ -175,10 +187,10 @@ export function BettingPlayerApp() {
                 />
                 <button
                   type="button"
-                  className="file-btn"
+                  className="camera-btn bt-gallery-btn"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  CHOOSE FROM GALLERY
+                  SELECT PHOTO
                 </button>
               </>
             )}
